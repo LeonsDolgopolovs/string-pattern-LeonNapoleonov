@@ -1,25 +1,49 @@
-def rabin_karp(pattern, text):
-    m, n = len(pattern), len(text)
-    p_hash, t_hash = hash(pattern), hash(text[:m])
+#221RDB432
+# python3
 
-    for i in range(n - m + 1):
-        if p_hash == t_hash and pattern == text[i:i+m]:
-            print(i, end=' ')
-        if i < n - m:
-            t_hash = rehash(text, t_hash, i, m)
-    print()
+def read_input():
+    inputLetter = input().strip().upper()
+    if inputLetter == "I":
+        inputPattern = input().strip()
+        inputText = input().strip()
+        return inputLetter, inputPattern, inputText
+    elif inputLetter == "F":
+        fileName = 'tests/06'
+        with open(fileName) as file:
+            inputPattern = file.readline().strip()
+            inputText = file.readline().strip()
+            return inputLetter, inputPattern, inputText
+    else:
+        print("try again")
+        exit()
 
-def hash(s):
-    h = 0
-    for c in s:
-        h = (h * 26 + ord(c) - ord('a')) % 101
-    return h
+def print_occurrences(output):
+    print(' '.join(map(str, output)))
 
-def rehash(s, h, i, m):
-    h = (h - (ord(s[i]) - ord('a')) * (26**(m-1))) % 101
-    h = (h * 26 + ord(s[i+m]) - ord('a')) % 101
-    return h
+def get_occurrences(input_vers, pattern, text):
+    text_len = len(text)
+    pattern_len = len(pattern)
+    occurrences = []
 
-pattern = str(input())
-text = str(input())
-rabin_karp(pattern, text)  # output: 2 5 8
+    if input_vers == "I":
+        for i in range(text_len -pattern_len + 1):
+            if text[i: i + pattern_len] == pattern:
+                occurrences.append(i)
+    elif input_vers == "F":
+        pattern_hash = 0
+        text_hash = 0
+        for i in range(pattern_len):
+            pattern_hash += ord(pattern[i]) * pow(10, pattern_len - i - 1)
+            text_hash += ord(text[i]) * pow(10, pattern_len - i - 1)         
+        
+        for i in range(text_len - pattern_len + 1):
+            if text_hash == pattern_hash:
+                if text[i:i + pattern_len] == pattern:
+                    occurrences.append(i)
+            
+            if i < text_len - pattern_len:
+                text_hash = (text_hash - ord(text[i]) * pow(10, pattern_len - 1)) * 10 + ord(text[i + pattern_len])                
+    return occurrences
+
+if __name__ == '__main__':
+    print_occurrences(get_occurrences(*read_input()))
